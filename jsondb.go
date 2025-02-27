@@ -141,13 +141,16 @@ func (t *Table) save(dbPath string) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	filePath := filepath.Join(dbPath, t.Name+".json")
-	file, err := os.Create(filePath)
+	data, err := json.MarshalIndent(t, "", "    ")
 	if err != nil {
-
 		return err
 	}
-	err = json.NewEncoder(file).Encode(t)
-	file.Close()
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.Write(data)
 	return err
 }
 func (db *Database) Insert(tabloAdi string, degerler map[string]any) error {
